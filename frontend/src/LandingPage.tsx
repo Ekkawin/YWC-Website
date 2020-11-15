@@ -1,7 +1,8 @@
 /** @jsx jsx */
-import React, { Fragment } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { Global, jsx, css } from '@emotion/react';
 import { Layout, Menu, Breadcrumb, Card } from 'antd';
+import axios from 'axios';
 
 const { Header, Content, Sider } = Layout;
 const LandingPageContainer = (props: any) => {
@@ -17,6 +18,17 @@ const LandingPageContainer = (props: any) => {
   );
 };
 export const LandingPage = () => {
+  useEffect(() => {
+    console.log('hihihihi');
+
+    axios({ method: 'get', url: 'https://panjs.com/ywc18.json' })
+      .then((data) => {
+        console.log('data', data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
   return (
     <LandingPageContainer>
       <Global
