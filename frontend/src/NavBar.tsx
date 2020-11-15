@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, Input, Select, Breadcrumb } from 'antd';
+import { Global, css } from '@emotion/react';
 
 const { Option } = Select;
 
@@ -14,10 +15,16 @@ export const NavBar = () => {
   const [form] = Form.useForm();
   return (
     <>
+      <Global
+        styles={css`
+          .some-class {
+          }
+        `}
+      />
       <Form form={form} onFinish={onFinish}>
-        <div className="flex justify-start items-center mx-48">
-          <img src={'halfLogo.png'} width={64} />
-          <Form.Item label="Address" className="w-full">
+        <div className="flex justify-start items-center mx-48 py-3">
+          <img src={'halfhalf-Logo.png'} width={256} className="mr-10" />
+          <Form.Item className="w-full mb-0">
             <Input.Group compact>
               <Form.Item
                 name={['address', 'province']}
@@ -42,7 +49,7 @@ export const NavBar = () => {
             </Input.Group>
           </Form.Item>
         </div>
-        <div className="bg-blue-700 px-48">
+        <div className="bg-blue-700 px-48 py-2">
           <Breadcrumb>
             <Breadcrumb.Item href="">หน้าแรก</Breadcrumb.Item>
             <Breadcrumb.Item href="">ค้นหา</Breadcrumb.Item>
