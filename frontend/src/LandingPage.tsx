@@ -1,57 +1,94 @@
 /** @jsx jsx */
 import React, { useState, useEffect, Fragment } from 'react';
 import { Global, jsx, css } from '@emotion/react';
-import { Layout, Menu, Breadcrumb, Card, Divider, Tag } from 'antd';
+import {
+  Layout,
+  Menu,
+  Breadcrumb,
+  Card,
+  Divider,
+  Tag,
+  Radio,
+  Select,
+  Spin,
+} from 'antd';
 import axios from 'axios';
+import { CardDetailContainer } from './components/container/CardDetailContainer';
+import { LandingPageContainer } from './components/container/LandingPageContainer';
+import { Merchant, Category } from './types/type';
+import { SubCategoriesPicker } from './components/sidebar/SubCategoriesPicker';
+import _ from 'lodash';
 
 const { Header, Content, Sider } = Layout;
-const LandingPageContainer = (props: any) => {
-  return (
-    <div
-      className="px-4 py-2"
-      css={css`
-        background-image: url('map-background.png');
-      `}
-    >
-      {props.children}
-    </div>
-  );
+const { Option } = Select;
+
+enum CategoryType {
+  GENERAL = 'สินค้าทั่วไป',
+  FOOD = 'อาหารและเครื่องดื่ม',
+  OTOP = 'ร้านค้า OTOP',
+  BLUEFLAG = 'ร้านธงฟ้า',
+  ALL = 'all',
+}
+
+const filterFunction = (
+  merchant: Merchant,
+  category: string | null = null,
+  priceRange: number | null = null,
+  subCategory: string | null = null,
+  area: string | null = null
+) => {
+  console.log('category', category);
+  console.log('priceRange', priceRange);
+  console.log('ispro', !priceRange);
+  const isInCategory = category
+    ? _.includes(category, merchant?.categoryName)
+    : true;
+  const isInPriceRange = priceRange
+    ? priceRange === merchant?.priceLevel
+    : true;
+  const isInSubCategory = subCategory
+    ? _.includes(subCategory, merchant?.subcategoryName)
+    : true;
+  const isInArea = area
+    ? _.includes(area, merchant?.addressProvinceName)
+    : true;
+  console.log('isInCategory && isInPriceRange', isInCategory, isInPriceRange);
+  return isInCategory && isInPriceRange && isInSubCategory && isInArea;
 };
-const CardDetailContainer = (props: any) => {
-  return <div className="p-3">{props.children}</div>;
-};
+
 export const LandingPage = () => {
   const [data, setData] = useState<any>(null);
+  const [merchants, setMerchants] = useState<Merchant[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [provinces, setProvinces] = useState<string[]>([]);
+  const [priceLevel, setPriceLevel] = useState<number | null>(null);
+  const [filteredCategories, setFilteredCategories] = useState<any>(null);
+  const [subCategories, setSubCategories] = useState(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [filteredSubCategory, setFilteredSubCategory] = useState<any>(null);
+  const [filteredProvince, setFilteredProvince] = useState<any>(null);
 
   useEffect(() => {
-    console.log('hihihihi');
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 200) {
-        console.log('this.responseText', this.responseText);
-        console.log('type', typeof this.responseText);
-        setData(JSON.parse(this.responseText));
-      }
-    };
-    xhttp.open('GET', 'https://panjs.com/ywc18.json', true);
-    xhttp.send();
+    setIsLoading(true);
 
-    // axios({
-    //   method: 'post',
-    //   url: `https://panjs.com/ywc18.json`,
-    //   headers: {
-    //     'X-Requested-With': 'XMLHttpRequest',
-    //     'content-type': 'application/x-www-form-urlencoded',
-    //   },
-    // })
-    //   .then((data) => {
-    //     console.log('data', data);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });
+    axios
+      .get('https://panjs.com/ywc18.json')
+      .then((data) => {
+        setData(data?.data);
+        setCategories(data?.data?.categories);
+
+        setFilteredCategories(data?.data?.categories[0]);
+
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsLoading(false);
+      });
   }, []);
   console.log('data', data);
+  console.log('categories1', categories);
+
   return (
     <LandingPageContainer>
       <Global
@@ -62,7 +99,7 @@ export const LandingPage = () => {
 
           .ant-layout-sider.ant-layout-sider-light {
             width: 100% !important;
-            min-width: 400px !important;
+            min-width: 350px !important;
           }
           .ant-card-body {
             display: flex;
@@ -72,47 +109,112 @@ export const LandingPage = () => {
       />
       ​<div className="text-lg font-bold">ผลการค้นหาร้านค้า</div>
       <Layout>
-        <Sider theme="light"></Sider>
-
-        <Content style={{ margin: '0 2rem 0' }}>
-          {data?.merchants?.map((merchant: any) => {
-            return (
-              <Card className="mb-4 p-1">
-                <img
-                  src={merchant?.coverImageId}
-                  width={256}
-                  style={{ maxHeight: '256px' }}
-                />
-                <CardDetailContainer>
-                  <div className="flex">
-                    {merchant?.shopNameTH}{' '}
-                    {merchant?.isOpen !== 'N/A' && (
-                      <Tag color={`${merchant?.isOpen === 'Y' ? 'green' : ''}`}>
-                        {merchant?.isOpen === 'Y' ? 'เปิดอยู่' : 'ปิดแล้ว'}
-                      </Tag>
-                    )}
-                  </div>
-                  <div className="flex">
-                    <div>{merchant?.subcategoryName}</div>
-                    <div> | {merchant?.priceLevel}</div>
-                    <div>
-                      |{merchant?.addressDistrictName}{' '}
-                      {merchant?.addressProvinceName}
-                    </div>
-                  </div>
-                  <Divider />
-                  {merchant?.highlightText}
-                  <div className="font-bold">
-                    สินค้าแนะนำ:
-                    {merchant?.recommendedItems?.map((item: any) => (
-                      <span className="mr-1 text-base font-normal">{item}</span>
-                    ))}
-                  </div>
-                </CardDetailContainer>
-              </Card>
-            );
-          })}
-        </Content>
+        <Sider theme="light">
+          <div>ประเภทร้านค้า</div>
+          <Radio.Group value={filteredCategories?.name}>
+            {categories?.map((category) => (
+              <Radio
+                style={{ display: 'block', height: '30px', lineHeight: '30px' }}
+                value={category?.name}
+                onChange={() => {
+                  setFilteredCategories(category);
+                  console.log('gilteredCategories', filteredCategories);
+                }}
+              >
+                {category?.name}
+              </Radio>
+            ))}
+          </Radio.Group>
+          <div>จังหวัดใกล้ฉัน</div>
+          <Select
+            className="w-full"
+            onSelect={(value) => setFilteredProvince(value)}
+            allowClear
+            onClear={() => {
+              setFilteredProvince(null);
+            }}
+          >
+            {data?.provinces?.map((province: string) => {
+              return <Option value={province}>{province}</Option>;
+            })}
+          </Select>
+          <div>ราคา</div>
+          <Select
+            className="w-full"
+            onSelect={(e) => {
+              setPriceLevel(e as number);
+            }}
+            allowClear
+            onClear={() => {
+              setPriceLevel(null);
+            }}
+          >
+            {data?.priceRange?.map((priceRange: string, index: number) => {
+              return <Option value={index + 1}>{priceRange}</Option>;
+            })}
+          </Select>
+          <SubCategoriesPicker
+            filteredCategories={filteredCategories}
+            setFilteredSubCategory={setFilteredSubCategory}
+          />
+        </Sider>
+        <Spin spinning={isLoading} />
+        {!isLoading && (
+          <Content style={{ margin: '0 2rem 0' }}>
+            {data?.merchants
+              ?.filter((merchant: Merchant) =>
+                // _.includes(filteredCategories?.name, merchant?.categoryName)
+                filterFunction(
+                  merchant,
+                  filteredCategories?.name,
+                  priceLevel,
+                  filteredSubCategory,
+                  filteredProvince
+                )
+              )
+              ?.map((merchant: Merchant) => {
+                return (
+                  <Card className="mb-4 p-1">
+                    <img
+                      src={merchant?.coverImageId}
+                      width={256}
+                      style={{ maxHeight: '256px' }}
+                    />
+                    <CardDetailContainer>
+                      <div className="flex">
+                        {merchant?.shopNameTH}{' '}
+                        {merchant?.isOpen !== 'N/A' && (
+                          <Tag
+                            color={`${merchant?.isOpen === 'Y' ? 'green' : ''}`}
+                          >
+                            {merchant?.isOpen === 'Y' ? 'เปิดอยู่' : 'ปิดแล้ว'}
+                          </Tag>
+                        )}
+                      </div>
+                      <div className="flex">
+                        <div>{merchant?.subcategoryName}</div>
+                        <div> | {merchant?.priceLevel}</div>
+                        <div>
+                          |{merchant?.addressDistrictName}{' '}
+                          {merchant?.addressProvinceName}
+                        </div>
+                      </div>
+                      <Divider />
+                      {merchant?.highlightText}
+                      <div className="font-bold">
+                        สินค้าแนะนำ:
+                        {merchant?.recommendedItems?.map((item: string) => (
+                          <span className="mr-1 text-base font-normal">
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </CardDetailContainer>
+                  </Card>
+                );
+              })}
+          </Content>
+        )}
       </Layout>
     </LandingPageContainer>
   );
