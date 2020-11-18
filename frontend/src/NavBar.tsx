@@ -1,8 +1,9 @@
 /** @jsx jsx */
-import React, { Fragment } from 'react';
-import { Form, Input, Select, Breadcrumb } from 'antd';
+import React, { Fragment, useState } from 'react';
+import { Form, Input, Select, Breadcrumb, Drawer } from 'antd';
 import { Global, css, jsx } from '@emotion/react';
 import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import { SideBar } from './components/sidebar/SideBar';
 const { Option } = Select;
 
 const onFinish = (value: any) => {
@@ -14,6 +15,7 @@ const NavBarWrapper = (props: any) => {
 };
 export const NavBar = () => {
   const [form] = Form.useForm();
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   return (
     <Fragment>
       <Global
@@ -35,12 +37,24 @@ export const NavBar = () => {
             display: flex;
             align-items: center;
           }
+          .ant-drawer-content-wrapper {
+            width: 100% !important;
+          }
+          .ant-drawer-header {
+            background-color: #2a4365;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+          .ant-drawer-title {
+            color: #fff !important;
+          }
         `}
       />
       <Form form={form} onFinish={onFinish}>
         <div className="flex justify-start items-center mx-2 sm:mx-6 md:mx-12 lg:mx-24 xl:mx-48 py-3">
           <img
-            src={'halfhalf-Logo.png'}
+            src={'/halfhalf-logo.png'}
             className="mr-2 sm:mr-4 md:mr-6 lg:mr-8 xl:mr-10"
             css={css`
               height: 40px !important;
@@ -92,7 +106,10 @@ export const NavBar = () => {
                   `}
                 />
               </Form.Item>
-              <FilterOutlined className="w-12 ml-4 hidden sm:block" />
+              <FilterOutlined
+                className="w-12 ml-4 md:hidden"
+                onClick={() => setIsVisible(true)}
+              />
             </Input.Group>
           </Form.Item>
         </div>
@@ -103,6 +120,25 @@ export const NavBar = () => {
           </Breadcrumb>
         </div>
       </Form>
+      <Drawer
+        title="กรอกผล"
+        placement="right"
+        closable={true}
+        onClose={() => {
+          setIsVisible(false);
+        }}
+        visible={isVisible}
+      >
+        <SideBar
+          categories={[]}
+          filteredCategories={''}
+          setFilteredCategories={() => {}}
+          data={''}
+          setFilteredProvince={() => {}}
+          setPriceLevel={() => {}}
+          setFilteredSubCategory={() => {}}
+        />
+      </Drawer>
     </Fragment>
   );
 };

@@ -17,8 +17,13 @@ import axios from 'axios';
 import { CardDetailContainer } from './components/container/CardDetailContainer';
 import { LandingPageContainer } from './components/container/LandingPageContainer';
 import { Merchant, Category } from './types/type';
+import { SideBar } from './components/sidebar/SideBar';
 import { SubCategoriesPicker } from './components/sidebar/SubCategoriesPicker';
+import { CarOutlined, PhoneOutlined } from '@ant-design/icons';
+import { ReactComponent as Dog } from './assets/dog.svg';
 import _ from 'lodash';
+import { observer } from 'mobx-react-lite';
+// import { dataStore } from './stores/dataStore';
 
 const { Header, Content, Sider } = Layout;
 const { Option } = Select;
@@ -58,6 +63,31 @@ const filterFunction = (
 };
 
 export const LandingPage = () => {
+  //   const {
+  //     data,
+  //     setData,
+
+  //     merchants,
+  //     setMerchants,
+
+  //     categories,
+  //     setCategories,
+
+  //     provinces,
+  //     setProvinces,
+
+  //     priceLevel,
+  //     setPriceLevel,
+
+  //     filteredCategories,
+  //     setFilteredCategories,
+
+  //     filteredSubCategory,
+  //     setFilteredSubCategory,
+
+  //     filteredProvince,
+  //     setFilteredProvince,
+  //   } = dataStore;
   const [data, setData] = useState<any>(null);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -73,7 +103,7 @@ export const LandingPage = () => {
     setIsLoading(true);
 
     axios
-      .get('https://panjs.com/ywc18.json')
+      .get('https://panjs.com/ywc18.jsonห ')
       .then((data) => {
         setData(data?.data);
         setCategories(data?.data?.categories);
@@ -90,9 +120,6 @@ export const LandingPage = () => {
   console.log('data', data);
   console.log('categories1', categories);
 
-  const SideBarTitle = ({ children }: { children: any }) => {
-    return <div className="text-base font-semibold">{children}</div>;
-  };
   const PriceLevelTag = (props: any) => {
     const { priceLevel } = props;
     if (priceLevel) {
@@ -109,7 +136,7 @@ export const LandingPage = () => {
   return (
     <div
       css={css`
-        background-image: url('map-background.png');
+        background-image: url('/map-background.png');
       `}
     >
       <Global
@@ -141,7 +168,7 @@ export const LandingPage = () => {
         `}
       />
       <Spin spinning={isLoading} />
-      {!isLoading && (
+      {!isLoading && merchants?.length !== 0 ? (
         <LandingPageContainer>
           ​<div className="text-lg font-bold">ผลการค้นหาร้านค้า</div>
           <Layout>
@@ -149,70 +176,13 @@ export const LandingPage = () => {
               theme="light"
               className="hidden md:block md:border md:border-gray-500 md:px-4 md:py-4"
             >
-              <SideBarTitle>ประเภทร้านค้า</SideBarTitle>
-              <Radio.Group
-                value={filteredCategories?.name}
-                className="mt-4 mb-8"
-              >
-                <Radio
-                  style={{
-                    display: 'block',
-                    height: '30px',
-                    lineHeight: '30px',
-                  }}
-                  onChange={() => {
-                    setFilteredCategories(null);
-                  }}
-                >
-                  ทั่วไป
-                </Radio>
-                {categories?.map((category) => (
-                  <Radio
-                    style={{
-                      display: 'block',
-                      height: '30px',
-                      lineHeight: '30px',
-                    }}
-                    value={category?.name}
-                    onChange={() => {
-                      setFilteredCategories(category);
-                      console.log('gilteredCategories', filteredCategories);
-                    }}
-                  >
-                    {category?.name}
-                  </Radio>
-                ))}
-              </Radio.Group>
-              <SideBarTitle>จังหวัด/ใกล้ฉัน</SideBarTitle>
-              <Select
-                className="w-full mt-2 mb-8"
-                onSelect={(value) => setFilteredProvince(value)}
-                allowClear
-                onClear={() => {
-                  setFilteredProvince(null);
-                }}
-              >
-                {data?.provinces?.map((province: string) => {
-                  return <Option value={province}>{province}</Option>;
-                })}
-              </Select>
-              <SideBarTitle>ราคา</SideBarTitle>
-              <Select
-                className="w-full mt-2 mb-8"
-                onSelect={(e) => {
-                  setPriceLevel(e as number);
-                }}
-                allowClear
-                onClear={() => {
-                  setPriceLevel(null);
-                }}
-              >
-                {data?.priceRange?.map((priceRange: string, index: number) => {
-                  return <Option value={index + 1}>{priceRange}</Option>;
-                })}
-              </Select>
-              <SubCategoriesPicker
+              <SideBar
+                categories={categories}
                 filteredCategories={filteredCategories}
+                setFilteredCategories={setFilteredCategories}
+                data={data}
+                setFilteredProvince={setFilteredProvince}
+                setPriceLevel={setPriceLevel}
                 setFilteredSubCategory={setFilteredSubCategory}
               />
             </Sider>
@@ -282,6 +252,29 @@ export const LandingPage = () => {
                             </span>
                           ))}
                         </div>
+                        <div className="flex justify-start items-center">
+                          {_.includes(merchant?.facilities, 'ที่จอดรถ') && (
+                            <span className="mr-2">
+                              <CarOutlined style={{ fontSize: '20px' }} />
+                            </span>
+                          )}
+                          {_.includes(
+                            merchant?.facilities,
+                            'สามารถนำสัตว์เลี้ยงเข้าได้'
+                          ) && (
+                            <span className="mr-2 w-6">
+                              <Dog />
+                            </span>
+                          )}
+                          {_.includes(
+                            merchant?.facilities,
+                            'รับจองล่วงหน้า'
+                          ) && (
+                            <span className="mr-2">
+                              <PhoneOutlined style={{ fontSize: '20px' }} />
+                            </span>
+                          )}
+                        </div>
                       </CardDetailContainer>
                     </Card>
                   );
@@ -289,6 +282,12 @@ export const LandingPage = () => {
             </Content>
           </Layout>
         </LandingPageContainer>
+      ) : (
+        <div className="h-screen flex justify-center items-center">
+          <h1 className="text-2xl font-bold">
+            ไม่พบร้านค้าที่ท่านกำลังค้นหา...
+          </h1>
+        </div>
       )}
     </div>
   );
