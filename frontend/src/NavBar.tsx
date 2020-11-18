@@ -1,7 +1,8 @@
-import React from 'react';
+/** @jsx jsx */
+import React, { Fragment } from 'react';
 import { Form, Input, Select, Breadcrumb } from 'antd';
-import { Global, css } from '@emotion/react';
-
+import { Global, css, jsx } from '@emotion/react';
+import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
 const { Option } = Select;
 
 const onFinish = (value: any) => {
@@ -14,16 +15,37 @@ const NavBarWrapper = (props: any) => {
 export const NavBar = () => {
   const [form] = Form.useForm();
   return (
-    <>
+    <Fragment>
       <Global
         styles={css`
-          .some-class {
+          /* .ant-select-selector {
+            border-top-left-radius: 10px !important;
+            border-bottom-left-radius: 10px !important;
+          } */
+          .ant-input-group.ant-input-group-compact > *:last-child {
+            border: 0 !important;
+          }
+          .ant-input-group.ant-input-group-compact > *:first-child {
+            border: 0 !important;
+          }
+          .ant-input-group.ant-input-group-compact > *:not(:last-child) {
+            border: 0 !important;
+          }
+          span.ant-input-group.ant-input-group-compact {
+            display: flex;
+            align-items: center;
           }
         `}
       />
       <Form form={form} onFinish={onFinish}>
-        <div className="flex justify-start items-center mx-48 py-3">
-          <img src={'halfhalf-Logo.png'} width={256} className="mr-10" />
+        <div className="flex justify-start items-center mx-2 sm:mx-6 md:mx-12 lg:mx-24 xl:mx-48 py-3">
+          <img
+            src={'halfhalf-Logo.png'}
+            className="mr-2 sm:mr-4 md:mr-6 lg:mr-8 xl:mr-10"
+            css={css`
+              height: 40px !important;
+            `}
+          />
           <Form.Item className="w-full mb-0">
             <Input.Group compact>
               <Form.Item
@@ -31,7 +53,16 @@ export const NavBar = () => {
                 noStyle
                 rules={[{ required: true, message: 'Province is required' }]}
               >
-                <Select placeholder="Select province">
+                <Select
+                  placeholder="Select province"
+                  className="hidden sm:block w-24 sm:w-32 md:w-48"
+                  css={css`
+                    .ant-select-selector {
+                      border-top-left-radius: 10px !important;
+                      border-bottom-left-radius: 10px !important;
+                    }
+                  `}
+                >
                   <Option value="Zhejiang">Zhejiang</Option>
                   <Option value="Jiangsu">Jiangsu</Option>
                 </Select>
@@ -41,21 +72,37 @@ export const NavBar = () => {
                 noStyle
                 rules={[{ required: true, message: 'Street is required' }]}
               >
-                <Input.Search
-                  style={{ width: '80%' }}
+                <Select
                   placeholder="Input street"
+                  className="w-full"
+                  suffixIcon={
+                    <div className="">
+                      <SearchOutlined />
+                    </div>
+                  }
+                  css={css`
+                    .ant-select-selector {
+                      border-top-right-radius: 10px !important;
+                      border-bottom-right-radius: 10px !important;
+                      @media (max-width: 640px) {
+                        border-top-left-radius: 10px !important;
+                        border-bottom-left-radius: 10px !important;
+                      }
+                    }
+                  `}
                 />
               </Form.Item>
+              <FilterOutlined className="w-12 ml-4 hidden sm:block" />
             </Input.Group>
           </Form.Item>
         </div>
-        <div className="bg-blue-700 px-48 py-2">
+        <div className="bg-blue-700 py-2 px-2 sm:px-6 md:px-12 lg:px-24 xl:px-48 ">
           <Breadcrumb>
             <Breadcrumb.Item href="">หน้าแรก</Breadcrumb.Item>
             <Breadcrumb.Item href="">ค้นหา</Breadcrumb.Item>
           </Breadcrumb>
         </div>
       </Form>
-    </>
+    </Fragment>
   );
 };

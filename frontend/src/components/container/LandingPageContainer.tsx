@@ -7,7 +7,10 @@ export const LandingPageContainer = (props: any) => {
     <div
       className="px-4 py-2"
       css={css`
-        background-image: url('map-background.png');
+        max-width: 1440px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
       `}
     >
       {props.children}

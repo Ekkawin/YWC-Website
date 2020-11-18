@@ -11,6 +11,7 @@ import {
   Radio,
   Select,
   Spin,
+  Rate,
 } from 'antd';
 import axios from 'axios';
 import { CardDetailContainer } from './components/container/CardDetailContainer';
@@ -89,8 +90,28 @@ export const LandingPage = () => {
   console.log('data', data);
   console.log('categories1', categories);
 
+  const SideBarTitle = ({ children }: { children: any }) => {
+    return <div className="text-base font-semibold">{children}</div>;
+  };
+  const PriceLevelTag = (props: any) => {
+    const { priceLevel } = props;
+    if (priceLevel) {
+      return (
+        <div>
+          {' '}
+          |<span className="text-black">{'฿'.repeat(priceLevel)}</span>
+          <span className="text-gray-600">{'฿'.repeat(4 - priceLevel)}</span>
+        </div>
+      );
+    } else return <Fragment></Fragment>;
+  };
+
   return (
-    <LandingPageContainer>
+    <div
+      css={css`
+        background-image: url('map-background.png');
+      `}
+    >
       <Global
         styles={css`
           .ant-layout {
@@ -104,118 +125,171 @@ export const LandingPage = () => {
           .ant-card-body {
             display: flex;
             padding: 0 !important;
+            @media (max-width: 1024px) {
+              display: block;
+            }
+          }
+          .ant-tag.ant-tag-has-color {
+            height: fit-content !important;
+          }
+          .ant-spin.ant-spin-spinning {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
           }
         `}
       />
-      ​<div className="text-lg font-bold">ผลการค้นหาร้านค้า</div>
-      <Layout>
-        <Sider theme="light">
-          <div>ประเภทร้านค้า</div>
-          <Radio.Group value={filteredCategories?.name}>
-            {categories?.map((category) => (
-              <Radio
-                style={{ display: 'block', height: '30px', lineHeight: '30px' }}
-                value={category?.name}
-                onChange={() => {
-                  setFilteredCategories(category);
-                  console.log('gilteredCategories', filteredCategories);
+      <Spin spinning={isLoading} />
+      {!isLoading && (
+        <LandingPageContainer>
+          ​<div className="text-lg font-bold">ผลการค้นหาร้านค้า</div>
+          <Layout>
+            <Sider
+              theme="light"
+              className="hidden md:block md:border md:border-gray-500 md:px-4 md:py-4"
+            >
+              <SideBarTitle>ประเภทร้านค้า</SideBarTitle>
+              <Radio.Group
+                value={filteredCategories?.name}
+                className="mt-4 mb-8"
+              >
+                <Radio
+                  style={{
+                    display: 'block',
+                    height: '30px',
+                    lineHeight: '30px',
+                  }}
+                  onChange={() => {
+                    setFilteredCategories(null);
+                  }}
+                >
+                  ทั่วไป
+                </Radio>
+                {categories?.map((category) => (
+                  <Radio
+                    style={{
+                      display: 'block',
+                      height: '30px',
+                      lineHeight: '30px',
+                    }}
+                    value={category?.name}
+                    onChange={() => {
+                      setFilteredCategories(category);
+                      console.log('gilteredCategories', filteredCategories);
+                    }}
+                  >
+                    {category?.name}
+                  </Radio>
+                ))}
+              </Radio.Group>
+              <SideBarTitle>จังหวัด/ใกล้ฉัน</SideBarTitle>
+              <Select
+                className="w-full mt-2 mb-8"
+                onSelect={(value) => setFilteredProvince(value)}
+                allowClear
+                onClear={() => {
+                  setFilteredProvince(null);
                 }}
               >
-                {category?.name}
-              </Radio>
-            ))}
-          </Radio.Group>
-          <div>จังหวัดใกล้ฉัน</div>
-          <Select
-            className="w-full"
-            onSelect={(value) => setFilteredProvince(value)}
-            allowClear
-            onClear={() => {
-              setFilteredProvince(null);
-            }}
-          >
-            {data?.provinces?.map((province: string) => {
-              return <Option value={province}>{province}</Option>;
-            })}
-          </Select>
-          <div>ราคา</div>
-          <Select
-            className="w-full"
-            onSelect={(e) => {
-              setPriceLevel(e as number);
-            }}
-            allowClear
-            onClear={() => {
-              setPriceLevel(null);
-            }}
-          >
-            {data?.priceRange?.map((priceRange: string, index: number) => {
-              return <Option value={index + 1}>{priceRange}</Option>;
-            })}
-          </Select>
-          <SubCategoriesPicker
-            filteredCategories={filteredCategories}
-            setFilteredSubCategory={setFilteredSubCategory}
-          />
-        </Sider>
-        <Spin spinning={isLoading} />
-        {!isLoading && (
-          <Content style={{ margin: '0 2rem 0' }}>
-            {data?.merchants
-              ?.filter((merchant: Merchant) =>
-                // _.includes(filteredCategories?.name, merchant?.categoryName)
-                filterFunction(
-                  merchant,
-                  filteredCategories?.name,
-                  priceLevel,
-                  filteredSubCategory,
-                  filteredProvince
+                {data?.provinces?.map((province: string) => {
+                  return <Option value={province}>{province}</Option>;
+                })}
+              </Select>
+              <SideBarTitle>ราคา</SideBarTitle>
+              <Select
+                className="w-full mt-2 mb-8"
+                onSelect={(e) => {
+                  setPriceLevel(e as number);
+                }}
+                allowClear
+                onClear={() => {
+                  setPriceLevel(null);
+                }}
+              >
+                {data?.priceRange?.map((priceRange: string, index: number) => {
+                  return <Option value={index + 1}>{priceRange}</Option>;
+                })}
+              </Select>
+              <SubCategoriesPicker
+                filteredCategories={filteredCategories}
+                setFilteredSubCategory={setFilteredSubCategory}
+              />
+            </Sider>
+
+            <Content style={{ margin: '0 2rem 0' }}>
+              {data?.merchants
+                ?.filter((merchant: Merchant) =>
+                  // _.includes(filteredCategories?.name, merchant?.categoryName)
+                  filterFunction(
+                    merchant,
+                    filteredCategories?.name,
+                    priceLevel,
+                    filteredSubCategory,
+                    filteredProvince
+                  )
                 )
-              )
-              ?.map((merchant: Merchant) => {
-                return (
-                  <Card className="mb-4 p-1">
-                    <img
-                      src={merchant?.coverImageId}
-                      width={256}
-                      style={{ maxHeight: '256px' }}
-                    />
-                    <CardDetailContainer>
-                      <div className="flex">
-                        {merchant?.shopNameTH}{' '}
-                        {merchant?.isOpen !== 'N/A' && (
-                          <Tag
-                            color={`${merchant?.isOpen === 'Y' ? 'green' : ''}`}
-                          >
-                            {merchant?.isOpen === 'Y' ? 'เปิดอยู่' : 'ปิดแล้ว'}
-                          </Tag>
-                        )}
-                      </div>
-                      <div className="flex">
-                        <div>{merchant?.subcategoryName}</div>
-                        <div> | {merchant?.priceLevel}</div>
-                        <div>
-                          |{merchant?.addressDistrictName}{' '}
-                          {merchant?.addressProvinceName}
+                ?.map((merchant: Merchant) => {
+                  return (
+                    <Card className="mb-4 p-1">
+                      <img
+                        src={merchant?.coverImageId}
+                        css={css`
+                          object-fit: cover;
+                          max-width: 240px;
+                          width: 100%;
+                          min-height: 224px;
+                          @media (max-width: 1024px) {
+                            max-width: none;
+                            max-height: 224px;
+                          }
+                        `}
+                      />
+                      <CardDetailContainer>
+                        <div className="flex text-lg font-semibold">
+                          {merchant?.shopNameTH}
+                          {merchant?.isOpen !== 'N/A' && (
+                            <Tag
+                              color={`${
+                                merchant?.isOpen === 'Y'
+                                  ? 'rgb(27 195 0)'
+                                  : 'rgb(161 161 161)'
+                              }`}
+                              className="ml-3 text-xs"
+                            >
+                              {merchant?.isOpen === 'Y'
+                                ? 'เปิดอยู่'
+                                : 'ปิดแล้ว'}
+                            </Tag>
+                          )}
                         </div>
-                      </div>
-                      <Divider />
-                      {merchant?.highlightText}
-                      <div className="font-bold">
-                        สินค้าแนะนำ:
-                        {merchant?.recommendedItems?.map((item: string) => (
-                          <span className="mr-1 text-base font-normal">
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    </CardDetailContainer>
-                  </Card>
-                );
-              })}
-          </Content>
-        )}
-      </Layout>
-    </LandingPageContainer>
+                        <div className="flex text-sm text-gray-700 flex-wrap">
+                          <div>{merchant?.subcategoryName}</div>
+                          {/* <div> | {merchant?.priceLevel}</div> */}
+                          <PriceLevelTag priceLevel={merchant?.priceLevel} />
+                          <div>
+                            |{merchant?.addressDistrictName}{' '}
+                            {merchant?.addressProvinceName}
+                          </div>
+                        </div>
+                        <Divider />
+                        {merchant?.highlightText}
+                        <div className="font-bold text-sm">
+                          สินค้าแนะนำ:
+                          {merchant?.recommendedItems?.map((item: string) => (
+                            <span className="mr-1 text-sm font-normal">
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      </CardDetailContainer>
+                    </Card>
+                  );
+                })}
+            </Content>
+          </Layout>
+        </LandingPageContainer>
+      )}
+    </div>
   );
 };
