@@ -99,6 +99,7 @@ export const LandingPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [filteredSubCategory, setFilteredSubCategory] = useState<any>(null);
   const [filteredProvince, setFilteredProvince] = useState<any>(null);
+  const [isApiError, setisApiError] = useState<boolean>(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -115,6 +116,7 @@ export const LandingPage = () => {
       })
       .catch((error) => {
         console.error(error);
+        setisApiError(true);
         setIsLoading(false);
       });
   }, []);
@@ -136,7 +138,13 @@ export const LandingPage = () => {
 
   const clean = DOMPurify.sanitize('<p>aek</p>');
   console.log('clean', clean);
-
+  if (isApiError) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <h1 className="text-2xl font-bold">ขออภัย ระบบขัดข้อง</h1>
+      </div>
+    );
+  }
   return (
     <div
       css={css`
