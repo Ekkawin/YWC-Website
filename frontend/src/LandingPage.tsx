@@ -22,6 +22,7 @@ import { SubCategoriesPicker } from './components/sidebar/SubCategoriesPicker';
 import { CarOutlined, PhoneOutlined } from '@ant-design/icons';
 import { ReactComponent as Dog } from './assets/dog.svg';
 import _ from 'lodash';
+import DOMPurify from 'dompurify';
 import { observer } from 'mobx-react-lite';
 // import { dataStore } from './stores/dataStore';
 
@@ -103,7 +104,7 @@ export const LandingPage = () => {
     setIsLoading(true);
 
     axios
-      .get('https://panjs.com/ywc18.jsonห ')
+      .get('https://panjs.com/ywc18.json')
       .then((data) => {
         setData(data?.data);
         setCategories(data?.data?.categories);
@@ -132,6 +133,9 @@ export const LandingPage = () => {
       );
     } else return <Fragment></Fragment>;
   };
+
+  const clean = DOMPurify.sanitize('<p>aek</p>');
+  console.log('clean', clean);
 
   return (
     <div
@@ -168,7 +172,7 @@ export const LandingPage = () => {
         `}
       />
       <Spin spinning={isLoading} />
-      {!isLoading && merchants?.length !== 0 ? (
+      {!isLoading && data?.merchants?.length !== 0 ? (
         <LandingPageContainer>
           ​<div className="text-lg font-bold">ผลการค้นหาร้านค้า</div>
           <Layout>
@@ -200,6 +204,9 @@ export const LandingPage = () => {
                   )
                 )
                 ?.map((merchant: Merchant) => {
+                  const cleanHighlightText = DOMPurify.sanitize(
+                    merchant?.highlightText
+                  );
                   return (
                     <Card className="mb-4 p-1">
                       <img
@@ -243,7 +250,12 @@ export const LandingPage = () => {
                           </div>
                         </div>
                         <Divider />
-                        {merchant?.highlightText}
+
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: cleanHighlightText,
+                          }}
+                        />
                         <div className="font-bold text-sm">
                           สินค้าแนะนำ:
                           {merchant?.recommendedItems?.map((item: string) => (
