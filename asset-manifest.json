@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/YWC-Website/static/css/main.7cc85c4f.chunk.css",
-    "main.js": "/YWC-Website/static/js/main.122c7720.chunk.js",
-    "main.js.map": "/YWC-Website/static/js/main.122c7720.chunk.js.map",
+    "main.js": "/YWC-Website/static/js/main.e5af7974.chunk.js",
+    "main.js.map": "/YWC-Website/static/js/main.e5af7974.chunk.js.map",
     "runtime-main.js": "/YWC-Website/static/js/runtime-main.2747bed1.js",
     "runtime-main.js.map": "/YWC-Website/static/js/runtime-main.2747bed1.js.map",
     "static/css/2.5cfd0e0c.chunk.css": "/YWC-Website/static/css/2.5cfd0e0c.chunk.css",
@@ -11,7 +11,7 @@
     "static/js/3.29ee27e2.chunk.js": "/YWC-Website/static/js/3.29ee27e2.chunk.js",
     "static/js/3.29ee27e2.chunk.js.map": "/YWC-Website/static/js/3.29ee27e2.chunk.js.map",
     "index.html": "/YWC-Website/index.html",
-    "precache-manifest.6bea8f1622e47720b66074e7c5686b5e.js": "/YWC-Website/precache-manifest.6bea8f1622e47720b66074e7c5686b5e.js",
+    "precache-manifest.6131363c386617a7a40f60f62c5a122d.js": "/YWC-Website/precache-manifest.6131363c386617a7a40f60f62c5a122d.js",
     "service-worker.js": "/YWC-Website/service-worker.js",
     "static/css/2.5cfd0e0c.chunk.css.map": "/YWC-Website/static/css/2.5cfd0e0c.chunk.css.map",
     "static/css/main.7cc85c4f.chunk.css.map": "/YWC-Website/static/css/main.7cc85c4f.chunk.css.map",
@@ -23,6 +23,6 @@
     "static/css/2.5cfd0e0c.chunk.css",
     "static/js/2.224ba4bf.chunk.js",
     "static/css/main.7cc85c4f.chunk.css",
-    "static/js/main.122c7720.chunk.js"
+    "static/js/main.e5af7974.chunk.js"
   ]
 }

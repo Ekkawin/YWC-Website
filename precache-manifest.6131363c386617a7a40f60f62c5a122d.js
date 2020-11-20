@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "e5093abfdd095522775a32512b91a271",
+    "revision": "1bf66e82b74bf182c0932d7c31b1b9f9",
     "url": "/YWC-Website/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/YWC-Website/static/css/2.5cfd0e0c.chunk.css"
   },
   {
-    "revision": "201954998935c677700b",
+    "revision": "82144791656826be84c8",
     "url": "/YWC-Website/static/css/main.7cc85c4f.chunk.css"
   },
   {
@@ -24,8 +24,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/YWC-Website/static/js/3.29ee27e2.chunk.js"
   },
   {
-    "revision": "201954998935c677700b",
-    "url": "/YWC-Website/static/js/main.122c7720.chunk.js"
+    "revision": "82144791656826be84c8",
+    "url": "/YWC-Website/static/js/main.e5af7974.chunk.js"
   },
   {
     "revision": "a18b1cd86c91d4ddbeab",
