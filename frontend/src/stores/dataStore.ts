@@ -1,62 +1,66 @@
 import { action, autorun, computed, observable } from 'mobx';
 class DataStore {
   @observable
-  data: any;
+  storeData: any;
 
   @action
-  setData = (data: any) => {
-    this.data = data;
+  setStoreData = (data: any) => {
+    this.storeData = data;
+    console.log('data', data);
+    console.log('this.storeData', this.storeData);
   };
 
   @observable
-  merchants: any;
+  loading: boolean = false;
+  @observable
+  storeMerchants: any;
 
   @action
-  setMerchants = (merchants: any) => {
-    this.merchants = merchants;
+  setStoreMerchants = (merchants: any) => {
+    this.storeMerchants = merchants;
   };
 
   @observable
-  categories: any;
+  storeCategories: any;
   @action
-  setCategories = (categories: any) => {
-    this.categories = categories;
+  setStoreCategories = (categories: any) => {
+    this.storeCategories = categories;
   };
 
   @observable
-  provinces: any;
+  storeProvinces: any;
 
   @action
-  setProvinces = (provinces: any) => {
-    this.provinces = provinces;
+  setStoreProvinces = (provinces: any) => {
+    this.storeProvinces = provinces;
   };
 
   @observable
-  priceLevel: any;
+  storePriceLevel: any;
   @action
-  setPriceLevel = (priceLevel: any) => {
-    this.priceLevel = priceLevel;
+  setStorePriceLevel = (priceLevel: any) => {
+    this.storePriceLevel = priceLevel;
   };
 
   @observable
-  filteredCategories: any;
+  storeFilteredCategories: any;
   @action
-  setFilteredCategories = (filteredCategories: any) => {
-    this.filteredCategories = filteredCategories;
+  setStoreFilteredCategories = (filteredCategories: any) => {
+    this.storeFilteredCategories = filteredCategories;
   };
 
   @observable
-  filteredSubCategory: any;
+  storeFilteredSubCategory: any;
 
   @action
-  setFilteredSubCategory = (filteredSubCategory: any) => {
-    this.filteredSubCategory = filteredSubCategory;
+  setStoreFilteredSubCategory = (filteredSubCategory: any) => {
+    this.storeFilteredSubCategory = filteredSubCategory;
   };
   @observable
-  filteredProvince: any;
+  storeFilteredProvince: any;
   @action
-  setFilteredProvince = (filteredProvince: any) => {
-    this.filteredProvince = filteredProvince;
+  setStoreFilteredProvince = (filteredProvince: any) => {
+    this.storeFilteredProvince = filteredProvince;
   };
 }
 

@@ -12,6 +12,7 @@ import {
   Select,
   Spin,
   Rate,
+  Button,
 } from 'antd';
 import axios from 'axios';
 import { CardDetailContainer } from './components/container/CardDetailContainer';
@@ -24,7 +25,8 @@ import { ReactComponent as Dog } from './assets/dog.svg';
 import _ from 'lodash';
 import DOMPurify from 'dompurify';
 import { observer } from 'mobx-react-lite';
-// import { dataStore } from './stores/dataStore';
+import { dataStore } from './stores/dataStore';
+import { toJS } from 'mobx';
 
 const { Header, Content, Sider } = Layout;
 const { Option } = Select;
@@ -63,32 +65,25 @@ const filterFunction = (
   return isInCategory && isInPriceRange && isInSubCategory && isInArea;
 };
 
-export const LandingPage = () => {
-  //   const {
-  //     data,
-  //     setData,
-
-  //     merchants,
-  //     setMerchants,
-
-  //     categories,
-  //     setCategories,
-
-  //     provinces,
-  //     setProvinces,
-
-  //     priceLevel,
-  //     setPriceLevel,
-
-  //     filteredCategories,
-  //     setFilteredCategories,
-
-  //     filteredSubCategory,
-  //     setFilteredSubCategory,
-
-  //     filteredProvince,
-  //     setFilteredProvince,
-  //   } = dataStore;
+export const LandingPage = observer(() => {
+  const {
+    storeData,
+    setStoreData,
+    storeMerchants,
+    setStoreMerchants,
+    storeCategories,
+    setStoreCategories,
+    storeProvinces,
+    setStoreProvinces,
+    storePriceLevel,
+    setStorePriceLevel,
+    storeFilteredCategories,
+    setStoreFilteredCategories,
+    storeFilteredSubCategory,
+    setStoreFilteredSubCategory,
+    storeFilteredProvince,
+    setStoreFilteredProvince,
+  } = dataStore;
   const [data, setData] = useState<any>(null);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -96,32 +91,55 @@ export const LandingPage = () => {
   const [priceLevel, setPriceLevel] = useState<number | null>(null);
   const [filteredCategories, setFilteredCategories] = useState<any>(null);
   const [subCategories, setSubCategories] = useState(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [filteredSubCategory, setFilteredSubCategory] = useState<any>(null);
   const [filteredProvince, setFilteredProvince] = useState<any>(null);
   const [isApiError, setisApiError] = useState<boolean>(false);
+  const [numberOfContent, setNumberOfContent] = useState<number>(5);
 
   useEffect(() => {
-    setIsLoading(true);
+    console.log('data change ');
+    // setData(storeData);
+    // console.log('hihihihihihihihi');
+    // console.log('storeDatainlanding', storeData);
+    // if (!!storeData) {
+    //   setIsLoading(false);
+    // }
+  }, [storeData]);
+  useEffect(() => {
+    setPriceLevel(storePriceLevel);
+  }, [storePriceLevel]);
+  useEffect(() => {
+    setFilteredProvince(storeFilteredProvince);
+  }, [storeFilteredProvince]);
+  useEffect(() => {
+    setFilteredSubCategory(storeFilteredSubCategory);
+  }, [storeFilteredSubCategory]);
+  useEffect(() => {
+    setFilteredCategories(storeFilteredCategories);
+  }, [storeFilteredCategories]);
+  // useEffect(() => {
+  //   setIsLoading(true);
 
-    axios
-      .get('https://panjs.com/ywc18.json')
-      .then((data) => {
-        setData(data?.data);
-        setCategories(data?.data?.categories);
+  //   axios
+  //     .get('https://panjs.com/ywc18.json')
+  //     .then((data) => {
+  //       setData(data?.data);
+  //       setCategories(data?.data?.categories);
 
-        setFilteredCategories(data?.data?.categories[0]);
+  //       setFilteredCategories(data?.data?.categories[0]);
 
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setisApiError(true);
-        setIsLoading(false);
-      });
-  }, []);
-  console.log('data', data);
+  //       setIsLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //       setisApiError(true);
+  //       setIsLoading(false);
+  //     });
+  // }, []);
+  console.log('data111111', data);
   console.log('categories1', categories);
+  console.log('toJS(dataStore)', toJS(dataStore));
 
   const PriceLevelTag = (props: any) => {
     const { priceLevel } = props;
@@ -149,6 +167,13 @@ export const LandingPage = () => {
     <div
       css={css`
         background-image: url('/map-background.png');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        min-height: 90vh;
+        @media (min-width: 1048px) {
+          height: calc(100vh- 101px);
+        }
       `}
     >
       <Global
@@ -177,10 +202,16 @@ export const LandingPage = () => {
             align-items: center;
             height: 80vh;
           }
+          .ant-layout-content {
+            @media (max-width: 480px) {
+              margin: 0 !important;
+            }
+          }
         `}
       />
-      <Spin spinning={isLoading} />
-      {!isLoading && data?.merchants?.length !== 0 ? (
+      {/* {JSON.stringify(dataStore)} */}
+      <Spin spinning={dataStore.loading} />
+      {!dataStore.loading && data?.merchants?.length !== 0 ? (
         <LandingPageContainer>
           ​<div className="text-lg font-bold">ผลการค้นหาร้านค้า</div>
           <Layout>
@@ -189,28 +220,29 @@ export const LandingPage = () => {
               className="hidden md:block md:border md:border-gray-500 md:px-4 md:py-4"
             >
               <SideBar
-                categories={categories}
-                filteredCategories={filteredCategories}
-                setFilteredCategories={setFilteredCategories}
-                data={data}
-                setFilteredProvince={setFilteredProvince}
-                setPriceLevel={setPriceLevel}
-                setFilteredSubCategory={setFilteredSubCategory}
+                categories={dataStore?.storeCategories}
+                filteredCategories={dataStore?.storeFilteredCategories}
+                setFilteredCategories={dataStore?.setStoreFilteredCategories}
+                data={dataStore?.storeData}
+                setFilteredProvince={dataStore?.setStoreFilteredProvince}
+                setPriceLevel={dataStore?.setStorePriceLevel}
+                setFilteredSubCategory={dataStore?.setStoreFilteredSubCategory}
               />
             </Sider>
 
             <Content style={{ margin: '0 2rem 0' }}>
-              {data?.merchants
+              {dataStore.storeData?.merchants
                 ?.filter((merchant: Merchant) =>
                   // _.includes(filteredCategories?.name, merchant?.categoryName)
                   filterFunction(
                     merchant,
-                    filteredCategories?.name,
-                    priceLevel,
-                    filteredSubCategory,
-                    filteredProvince
+                    dataStore?.storeFilteredCategories?.name,
+                    dataStore?.storePriceLevel,
+                    dataStore?.storeFilteredSubCategory,
+                    dataStore?.storeFilteredProvince
                   )
                 )
+                ?.slice(0, numberOfContent)
                 ?.map((merchant: Merchant) => {
                   const cleanHighlightText = DOMPurify.sanitize(
                     merchant?.highlightText
@@ -221,12 +253,13 @@ export const LandingPage = () => {
                         src={merchant?.coverImageId}
                         css={css`
                           object-fit: cover;
-                          max-width: 240px;
-                          width: 100%;
-                          min-height: 224px;
+                          width: 240px;
+
+                          height: 224px;
                           @media (max-width: 1024px) {
                             max-width: none;
                             max-height: 224px;
+                            width: 100%;
                           }
                         `}
                       />
@@ -299,6 +332,16 @@ export const LandingPage = () => {
                     </Card>
                   );
                 })}
+              <div className="flex justify-center">
+                <Button
+                  className="w-full h-12 rounded text-lg"
+                  onClick={() => {
+                    setNumberOfContent(numberOfContent + 5);
+                  }}
+                >
+                  ดูเพิ่มเติม
+                </Button>
+              </div>
             </Content>
           </Layout>
         </LandingPageContainer>
@@ -311,4 +354,4 @@ export const LandingPage = () => {
       )}
     </div>
   );
-};
+});

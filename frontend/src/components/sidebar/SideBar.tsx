@@ -26,6 +26,7 @@ export const SideBar = (props: Props) => {
     setPriceLevel,
     setFilteredSubCategory,
   } = props;
+  console.log('data in sidebar', data);
   return (
     <Fragment>
       <SideBarTitle>ประเภทร้านค้า</SideBarTitle>

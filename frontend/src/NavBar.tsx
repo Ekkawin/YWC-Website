@@ -2,8 +2,14 @@
 import React, { Fragment, useState } from 'react';
 import { Form, Input, Select, Breadcrumb, Drawer } from 'antd';
 import { Global, css, jsx } from '@emotion/react';
-import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  FilterOutlined,
+  LeftOutlined,
+} from '@ant-design/icons';
 import { SideBar } from './components/sidebar/SideBar';
+import { observer } from 'mobx-react-lite';
+import { dataStore } from './stores/dataStore';
 const { Option } = Select;
 
 const onFinish = (value: any) => {
@@ -13,7 +19,7 @@ const onFinish = (value: any) => {
 const NavBarWrapper = (props: any) => {
   return <div className="px-48 py-2">{props.children}</div>;
 };
-export const NavBar = () => {
+export const NavBar = observer(() => {
   const [form] = Form.useForm();
   const [isVisible, setIsVisible] = useState<boolean>(false);
   return (
@@ -48,6 +54,7 @@ export const NavBar = () => {
           }
           .ant-drawer-title {
             color: #fff !important;
+            width: 100%;
           }
         `}
       />
@@ -70,6 +77,9 @@ export const NavBar = () => {
                 <Select
                   placeholder="Select province"
                   className="hidden sm:block w-24 sm:w-32 md:w-48"
+                  onSelect={(value) => {
+                    dataStore?.setStoreFilteredProvince(value);
+                  }}
                   css={css`
                     .ant-select-selector {
                       border-top-left-radius: 10px !important;
@@ -77,8 +87,9 @@ export const NavBar = () => {
                     }
                   `}
                 >
-                  <Option value="Zhejiang">Zhejiang</Option>
-                  <Option value="Jiangsu">Jiangsu</Option>
+                  {dataStore?.storeProvinces?.map((storeProvince: any) => (
+                    <Option value={storeProvince}>{storeProvince}</Option>
+                  ))}
                 </Select>
               </Form.Item>
               <Form.Item
@@ -89,6 +100,9 @@ export const NavBar = () => {
                 <Select
                   placeholder="Input street"
                   className="w-full"
+                  onSelect={(value) => {
+                    dataStore?.setStoreFilteredCategories(value);
+                  }}
                   suffixIcon={
                     <div className="">
                       <SearchOutlined />
@@ -104,7 +118,11 @@ export const NavBar = () => {
                       }
                     }
                   `}
-                />
+                >
+                  {dataStore?.storeCategories?.map((storecat: any) => (
+                    <Option value={storecat?.name}>{storecat?.name}</Option>
+                  ))}
+                </Select>
               </Form.Item>
               <FilterOutlined
                 className="w-12 ml-4 md:hidden"
@@ -121,24 +139,36 @@ export const NavBar = () => {
         </div>
       </Form>
       <Drawer
-        title="กรอกผล"
+        title={
+          <div className="relative flex justify-center">
+            <span
+              css={css`
+                position: absolute;
+                left: 5%;
+                height: fit-content;
+              `}
+            >
+              <LeftOutlined />
+            </span>
+            <span>กรอกผล</span>
+          </div>
+        }
         placement="right"
-        closable={true}
         onClose={() => {
           setIsVisible(false);
         }}
         visible={isVisible}
       >
         <SideBar
-          categories={[]}
-          filteredCategories={''}
-          setFilteredCategories={() => {}}
-          data={''}
-          setFilteredProvince={() => {}}
-          setPriceLevel={() => {}}
-          setFilteredSubCategory={() => {}}
+          categories={dataStore?.storeCategories}
+          filteredCategories={dataStore?.storeFilteredCategories}
+          setFilteredCategories={dataStore?.setStoreFilteredCategories}
+          data={dataStore?.storeData}
+          setFilteredProvince={dataStore?.setStoreFilteredProvince}
+          setPriceLevel={dataStore?.setStoreProvinces}
+          setFilteredSubCategory={dataStore?.setStoreFilteredSubCategory}
         />
       </Drawer>
     </Fragment>
   );
-};
+});
