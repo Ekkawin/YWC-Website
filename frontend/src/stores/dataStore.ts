@@ -6,8 +6,6 @@ class DataStore {
   @action
   setStoreData = (data: any) => {
     this.storeData = data;
-    console.log('data', data);
-    console.log('this.storeData', this.storeData);
   };
 
   @observable
@@ -62,6 +60,9 @@ class DataStore {
   setStoreFilteredProvince = (filteredProvince: any) => {
     this.storeFilteredProvince = filteredProvince;
   };
+
+  @observable
+  isApiError: boolean = false;
 }
 
 export const dataStore = new DataStore();

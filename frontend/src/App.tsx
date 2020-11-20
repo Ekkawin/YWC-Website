@@ -12,29 +12,13 @@ import { observer } from 'mobx-react-lite';
 
 export const App = observer(() => {
   const {
-    storeData,
     setStoreData,
 
-    storeMerchants,
-    setStoreMerchants,
-
-    storeCategories,
     setStoreCategories,
 
-    storeProvinces,
     setStoreProvinces,
 
-    storePriceLevel,
-    setStorePriceLevel,
-
-    storeFilteredCategories,
     setStoreFilteredCategories,
-
-    storeFilteredSubCategory,
-    setStoreFilteredSubCategory,
-
-    storeFilteredProvince,
-    setStoreFilteredProvince,
   } = dataStore;
   useEffect(() => {
     dataStore.loading = true;
@@ -45,12 +29,12 @@ export const App = observer(() => {
         setStoreCategories(data?.data?.categories);
         setStoreFilteredCategories(data?.data?.categories[0]);
         setStoreProvinces(data?.data?.provinces);
-        console.log('data', data);
-        console.log('storeDataapp', storeData);
+
         dataStore.loading = false;
       })
       .catch((error) => {
         console.error(error);
+        dataStore.isApiError = true;
       });
   }, []);
   return (

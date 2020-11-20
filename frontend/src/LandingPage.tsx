@@ -1,20 +1,8 @@
 /** @jsx jsx */
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, Fragment } from 'react';
 import { Global, jsx, css } from '@emotion/react';
-import {
-  Layout,
-  Menu,
-  Breadcrumb,
-  Card,
-  Divider,
-  Tag,
-  Radio,
-  Select,
-  Spin,
-  Rate,
-  Button,
-} from 'antd';
-import axios from 'axios';
+import { Layout, Card, Divider, Tag, Select, Spin, Button } from 'antd';
+
 import { CardDetailContainer } from './components/container/CardDetailContainer';
 import { LandingPageContainer } from './components/container/LandingPageContainer';
 import { Merchant, Category } from './types/type';
@@ -32,11 +20,11 @@ const { Header, Content, Sider } = Layout;
 const { Option } = Select;
 
 enum CategoryType {
-  GENERAL = 'สินค้าทั่วไป',
-  FOOD = 'อาหารและเครื่องดื่ม',
-  OTOP = 'ร้านค้า OTOP',
-  BLUEFLAG = 'ร้านธงฟ้า',
-  ALL = 'all',
+  GENERAL = 'ร้านสินค้าทั่วไป',
+  FOOD = 'ร้านอาหารและเครื่องดื่ม',
+  OTOP = 'ร้านร้านค้า OTOP',
+  BLUEFLAG = 'ร้านร้านธงฟ้า',
+  ALL = 'ร้านall',
 }
 
 const filterFunction = (
@@ -46,9 +34,6 @@ const filterFunction = (
   subCategory: string | null = null,
   area: string | null = null
 ) => {
-  console.log('category', category);
-  console.log('priceRange', priceRange);
-  console.log('ispro', !priceRange);
   const isInCategory = category
     ? _.includes(category, merchant?.categoryName)
     : true;
@@ -61,85 +46,12 @@ const filterFunction = (
   const isInArea = area
     ? _.includes(area, merchant?.addressProvinceName)
     : true;
-  console.log('isInCategory && isInPriceRange', isInCategory, isInPriceRange);
+
   return isInCategory && isInPriceRange && isInSubCategory && isInArea;
 };
 
 export const LandingPage = observer(() => {
-  const {
-    storeData,
-    setStoreData,
-    storeMerchants,
-    setStoreMerchants,
-    storeCategories,
-    setStoreCategories,
-    storeProvinces,
-    setStoreProvinces,
-    storePriceLevel,
-    setStorePriceLevel,
-    storeFilteredCategories,
-    setStoreFilteredCategories,
-    storeFilteredSubCategory,
-    setStoreFilteredSubCategory,
-    storeFilteredProvince,
-    setStoreFilteredProvince,
-  } = dataStore;
-  const [data, setData] = useState<any>(null);
-  const [merchants, setMerchants] = useState<Merchant[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [provinces, setProvinces] = useState<string[]>([]);
-  const [priceLevel, setPriceLevel] = useState<number | null>(null);
-  const [filteredCategories, setFilteredCategories] = useState<any>(null);
-  const [subCategories, setSubCategories] = useState(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [filteredSubCategory, setFilteredSubCategory] = useState<any>(null);
-  const [filteredProvince, setFilteredProvince] = useState<any>(null);
-  const [isApiError, setisApiError] = useState<boolean>(false);
   const [numberOfContent, setNumberOfContent] = useState<number>(5);
-
-  useEffect(() => {
-    console.log('data change ');
-    // setData(storeData);
-    // console.log('hihihihihihihihi');
-    // console.log('storeDatainlanding', storeData);
-    // if (!!storeData) {
-    //   setIsLoading(false);
-    // }
-  }, [storeData]);
-  useEffect(() => {
-    setPriceLevel(storePriceLevel);
-  }, [storePriceLevel]);
-  useEffect(() => {
-    setFilteredProvince(storeFilteredProvince);
-  }, [storeFilteredProvince]);
-  useEffect(() => {
-    setFilteredSubCategory(storeFilteredSubCategory);
-  }, [storeFilteredSubCategory]);
-  useEffect(() => {
-    setFilteredCategories(storeFilteredCategories);
-  }, [storeFilteredCategories]);
-  // useEffect(() => {
-  //   setIsLoading(true);
-
-  //   axios
-  //     .get('https://panjs.com/ywc18.json')
-  //     .then((data) => {
-  //       setData(data?.data);
-  //       setCategories(data?.data?.categories);
-
-  //       setFilteredCategories(data?.data?.categories[0]);
-
-  //       setIsLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //       setisApiError(true);
-  //       setIsLoading(false);
-  //     });
-  // }, []);
-  console.log('data111111', data);
-  console.log('categories1', categories);
-  console.log('toJS(dataStore)', toJS(dataStore));
 
   const PriceLevelTag = (props: any) => {
     const { priceLevel } = props;
@@ -155,16 +67,28 @@ export const LandingPage = observer(() => {
   };
 
   const clean = DOMPurify.sanitize('<p>aek</p>');
-  console.log('clean', clean);
-  if (isApiError) {
+
+  if (dataStore?.isApiError) {
     return (
       <div className="h-screen flex justify-center items-center">
         <h1 className="text-2xl font-bold">ขออภัย ระบบขัดข้อง</h1>
       </div>
     );
   }
+  const length = dataStore.storeData?.merchants?.filter((merchant: Merchant) =>
+    // _.includes(filteredCategories?.name, merchant?.categoryName)
+    filterFunction(
+      merchant,
+      dataStore?.storeFilteredCategories?.name,
+      dataStore?.storePriceLevel,
+      dataStore?.storeFilteredSubCategory,
+      dataStore?.storeFilteredProvince
+    )
+  )?.length;
+
   return (
     <div
+      className="overflow-y-auto"
       css={css`
         background-image: url(${process.env.PUBLIC_URL}/map-background.png);
         background-size: cover;
@@ -173,7 +97,7 @@ export const LandingPage = observer(() => {
         min-height: 90vh;
         @media (min-width: 1048px) {
           height: calc(100vh- 101px);
-        } ;;
+        }
       `}
     >
       <Global
@@ -185,6 +109,7 @@ export const LandingPage = observer(() => {
           .ant-layout-sider.ant-layout-sider-light {
             width: 100% !important;
             min-width: 350px !important;
+            height: fit-content;
           }
           .ant-card-body {
             display: flex;
@@ -209,11 +134,11 @@ export const LandingPage = observer(() => {
           }
         `}
       />
-      {/* {JSON.stringify(dataStore)} */}
+
       <Spin spinning={dataStore.loading} />
-      {!dataStore.loading && data?.merchants?.length !== 0 ? (
+      {!dataStore.loading && (
         <LandingPageContainer>
-          ​<div className="text-lg font-bold">ผลการค้นหาร้านค้า</div>
+          ​<div className="text-lg font-bold mb-8">ผลการค้นหา</div>
           <Layout>
             <Sider
               theme="light"
@@ -229,128 +154,132 @@ export const LandingPage = observer(() => {
                 setFilteredSubCategory={dataStore?.setStoreFilteredSubCategory}
               />
             </Sider>
-
-            <Content style={{ margin: '0 2rem 0' }}>
-              {dataStore.storeData?.merchants
-                ?.filter((merchant: Merchant) =>
-                  // _.includes(filteredCategories?.name, merchant?.categoryName)
-                  filterFunction(
-                    merchant,
-                    dataStore?.storeFilteredCategories?.name,
-                    dataStore?.storePriceLevel,
-                    dataStore?.storeFilteredSubCategory,
-                    dataStore?.storeFilteredProvince
+            {length > 0 ? (
+              <Content style={{ margin: '0 2rem 0' }}>
+                {dataStore.storeData?.merchants
+                  ?.filter((merchant: Merchant) =>
+                    // _.includes(filteredCategories?.name, merchant?.categoryName)
+                    filterFunction(
+                      merchant,
+                      dataStore?.storeFilteredCategories?.name,
+                      dataStore?.storePriceLevel,
+                      dataStore?.storeFilteredSubCategory,
+                      dataStore?.storeFilteredProvince
+                    )
                   )
-                )
-                ?.slice(0, numberOfContent)
-                ?.map((merchant: Merchant) => {
-                  const cleanHighlightText = DOMPurify.sanitize(
-                    merchant?.highlightText
-                  );
-                  return (
-                    <Card className="mb-4 p-1">
-                      <img
-                        src={merchant?.coverImageId}
-                        css={css`
-                          object-fit: cover;
-                          width: 240px;
+                  ?.slice(0, numberOfContent)
+                  ?.map((merchant: Merchant) => {
+                    const cleanHighlightText = DOMPurify.sanitize(
+                      merchant?.highlightText
+                    );
 
-                          height: 224px;
-                          @media (max-width: 1024px) {
-                            max-width: none;
-                            max-height: 224px;
-                            width: 100%;
-                          }
-                        `}
-                      />
-                      <CardDetailContainer>
-                        <div className="flex text-lg font-semibold">
-                          {merchant?.shopNameTH}
-                          {merchant?.isOpen !== 'N/A' && (
-                            <Tag
-                              color={`${
-                                merchant?.isOpen === 'Y'
-                                  ? 'rgb(27 195 0)'
-                                  : 'rgb(161 161 161)'
-                              }`}
-                              className="ml-3 text-xs"
-                            >
-                              {merchant?.isOpen === 'Y'
-                                ? 'เปิดอยู่'
-                                : 'ปิดแล้ว'}
-                            </Tag>
-                          )}
-                        </div>
-                        <div className="flex text-sm text-gray-700 flex-wrap">
-                          <div>{merchant?.subcategoryName}</div>
-                          {/* <div> | {merchant?.priceLevel}</div> */}
-                          <PriceLevelTag priceLevel={merchant?.priceLevel} />
-                          <div>
-                            |{merchant?.addressDistrictName}{' '}
-                            {merchant?.addressProvinceName}
-                          </div>
-                        </div>
-                        <Divider />
+                    return (
+                      <Card className="mb-4 p-1">
+                        <img
+                          src={merchant?.coverImageId}
+                          css={css`
+                            object-fit: cover;
+                            width: 240px;
 
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: cleanHighlightText,
-                          }}
+                            height: 224px;
+                            @media (max-width: 1024px) {
+                              max-width: none;
+                              max-height: 224px;
+                              width: 100%;
+                            }
+                          `}
                         />
-                        <div className="font-bold text-sm">
-                          สินค้าแนะนำ:
-                          {merchant?.recommendedItems?.map((item: string) => (
-                            <span className="mr-1 text-sm font-normal">
-                              {item}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="flex justify-start items-center">
-                          {_.includes(merchant?.facilities, 'ที่จอดรถ') && (
-                            <span className="mr-2">
-                              <CarOutlined style={{ fontSize: '20px' }} />
-                            </span>
-                          )}
-                          {_.includes(
-                            merchant?.facilities,
-                            'สามารถนำสัตว์เลี้ยงเข้าได้'
-                          ) && (
-                            <span className="mr-2 w-6">
-                              <Dog />
-                            </span>
-                          )}
-                          {_.includes(
-                            merchant?.facilities,
-                            'รับจองล่วงหน้า'
-                          ) && (
-                            <span className="mr-2">
-                              <PhoneOutlined style={{ fontSize: '20px' }} />
-                            </span>
-                          )}
-                        </div>
-                      </CardDetailContainer>
-                    </Card>
-                  );
-                })}
-              <div className="flex justify-center">
-                <Button
-                  className="w-full h-12 rounded text-lg"
-                  onClick={() => {
-                    setNumberOfContent(numberOfContent + 5);
-                  }}
-                >
-                  ดูเพิ่มเติม
-                </Button>
-              </div>
-            </Content>
+                        <CardDetailContainer>
+                          <div className="flex text-lg font-semibold">
+                            {merchant?.shopNameTH}
+                            {merchant?.isOpen !== 'N/A' && (
+                              <Tag
+                                color={`${
+                                  merchant?.isOpen === 'Y'
+                                    ? 'rgb(27 195 0)'
+                                    : 'rgb(161 161 161)'
+                                }`}
+                                className="ml-3 text-xs"
+                              >
+                                {merchant?.isOpen === 'Y'
+                                  ? 'เปิดอยู่'
+                                  : 'ปิดแล้ว'}
+                              </Tag>
+                            )}
+                          </div>
+                          <div className="flex text-sm text-gray-700 flex-wrap">
+                            <div>{merchant?.subcategoryName}</div>
+                            {/* <div> | {merchant?.priceLevel}</div> */}
+                            <PriceLevelTag priceLevel={merchant?.priceLevel} />
+                            <div>
+                              |{merchant?.addressDistrictName}{' '}
+                              {merchant?.addressProvinceName}
+                            </div>
+                          </div>
+                          <Divider />
+
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: cleanHighlightText,
+                            }}
+                          />
+                          <div className="font-bold text-sm">
+                            สินค้าแนะนำ:
+                            {merchant?.recommendedItems?.map((item: string) => (
+                              <span className="mr-1 text-sm font-normal">
+                                {item}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="flex justify-start items-center">
+                            {_.includes(merchant?.facilities, 'ที่จอดรถ') && (
+                              <span className="mr-2">
+                                <CarOutlined style={{ fontSize: '20px' }} />
+                              </span>
+                            )}
+                            {_.includes(
+                              merchant?.facilities,
+                              'สามารถนำสัตว์เลี้ยงเข้าได้'
+                            ) && (
+                              <span className="mr-2 w-6">
+                                <Dog />
+                              </span>
+                            )}
+                            {_.includes(
+                              merchant?.facilities,
+                              'รับจองล่วงหน้า'
+                            ) && (
+                              <span className="mr-2">
+                                <PhoneOutlined style={{ fontSize: '20px' }} />
+                              </span>
+                            )}
+                          </div>
+                        </CardDetailContainer>
+                      </Card>
+                    );
+                  })}
+                <div className="flex justify-center">
+                  <Button
+                    className="w-full h-12 rounded text-lg"
+                    onClick={() => {
+                      setNumberOfContent(numberOfContent + 5);
+                    }}
+                  >
+                    ดูเพิ่มเติม
+                  </Button>
+                </div>
+              </Content>
+            ) : (
+              <Content>
+                <div className="h-screen flex justify-center items-center">
+                  <h1 className="text-2xl font-bold">
+                    ไม่พบร้านค้าที่ท่านกำลังค้นหา...
+                  </h1>
+                </div>
+              </Content>
+            )}
           </Layout>
         </LandingPageContainer>
-      ) : (
-        <div className="h-screen flex justify-center items-center">
-          <h1 className="text-2xl font-bold">
-            ไม่พบร้านค้าที่ท่านกำลังค้นหา...
-          </h1>
-        </div>
       )}
     </div>
   );

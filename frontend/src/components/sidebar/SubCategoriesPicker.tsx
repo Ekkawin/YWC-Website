@@ -23,7 +23,6 @@ export const SubCategoriesPicker = (props: Props) => {
                 style={{ display: 'block', height: '30px', lineHeight: '30px' }}
                 onChange={() => {
                   setFilteredSubCategory(subcategory);
-                  console.log('gilteredCategories', filteredCategories);
                 }}
               >
                 {subcategory}
