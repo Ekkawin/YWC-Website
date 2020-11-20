@@ -61,7 +61,7 @@ export const NavBar = observer(() => {
       <Form form={form} onFinish={onFinish}>
         <div className="flex justify-start items-center mx-2 sm:mx-6 md:mx-12 lg:mx-24 xl:mx-48 py-3">
           <img
-            src={'/halfhalf-logo.png'}
+            src={`${process.env.PUBLIC_URL}/halfhalf-logo.png`}
             className="mr-2 sm:mr-4 md:mr-6 lg:mr-8 xl:mr-10"
             css={css`
               height: 40px !important;

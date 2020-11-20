@@ -166,14 +166,14 @@ export const LandingPage = observer(() => {
   return (
     <div
       css={css`
-        background-image: url('/map-background.png');
+        background-image: url(${process.env.PUBLIC_URL}/map-background.png);
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
         min-height: 90vh;
         @media (min-width: 1048px) {
           height: calc(100vh- 101px);
-        }
+        } ;;
       `}
     >
       <Global
